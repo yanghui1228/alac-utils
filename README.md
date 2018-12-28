@@ -22,4 +22,4 @@ Install the following packages: `ffmpeg flac`
 
 #### Usage
 
-`flac2alac <flacfile>`
+`flac2alac <flacfile> <-e> <encoding>`
