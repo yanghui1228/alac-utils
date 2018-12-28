@@ -109,7 +109,6 @@ main()
 		echo "Trying to auto-convert $cue_file to UTF-8 ..."
 		enca -L "$ENCA_LANGUAGE" -x UTF-8 < "$cue_file" > "tmp/$cue_file"
 	elif program_exists iconv; then
-		#local encoding=`file --mime "$cue_file" | sed 's/^[^:]*: .*set=\(.*\)/\1/'`
 		if [ -z "$3" ]; then
 			echo "Trying to auto-convert $cue_file to UTF-8 ..."
 			encoding=`file --mime "$cue_file" | sed 's/^[^:]*: .*set=\(.*\)/\1/'`
