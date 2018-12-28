@@ -6,7 +6,7 @@
 # cue2alac will try to automatically fix possible wrong (non UTF-8) encoding with 'enca' program (if it is installed).
 # Please set your language preference for enca here.
 #
-ENCA_LANGUAGE='zh'
+ENCA_LANGUAGE='ru'
 
 usage()
 {
