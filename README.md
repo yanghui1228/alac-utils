@@ -10,7 +10,7 @@ Converts ape+cue, wv+cue, flac+cue to separate ALAC (.m4a) files.
 Install the following packages: `ffmpeg flac shntool cuetools`
 
 #### Usage:
-`cue2alac <cuefile>`
+`cue2alac <cuefile> <-e> <encoding>`
 
 
 ## flac2alac
@@ -22,4 +22,4 @@ Install the following packages: `ffmpeg flac`
 
 #### Usage
 
-`flac2alac <flacfile> <-e> <encoding>`
+`flac2alac <flacfile>`
