@@ -113,7 +113,8 @@ main()
 		if [ -z "$3" ]; then
 			echo "Trying to auto-convert $cue_file to UTF-8 ..."
 			encoding=`file --mime "$cue_file" | sed 's/^[^:]*: .*set=\(.*\)/\1/'`
-		fi	
+		fi
+	# when the encoding option <-e> is provided, convert from the option <-e>.
 		echo "Trying to convert $cue_file from $encoding to UTF-8 ..."
 		iconv -f "$encoding" -t UTF-8 "$cue_file" > "tmp/$cue_file"
 	else
@@ -184,3 +185,4 @@ main()
 }
 
 main "$@"
+
