@@ -1,25 +1,15 @@
 # ALAC (Apple Lossless Audio Codec) command-line utils
 
-Инструкции на русском языке можно найти [здесь](http://zoid.cc/alac-utils).
+## mkalac
 
-## cue2alac
-
-Converts ape+cue, wv+cue, flac+cue to separate ALAC (.m4a) files.
+Converts ape+cue, wv+cue, flac+cue, flac to ALAC (.m4a) files.
 
 #### Dependencies:
 Install the following packages: `ffmpeg flac shntool cuetools`
 
 #### Usage:
-`cue2alac <cuefile> <-e> <encoding>`
-
-
-## flac2alac
-
-Converts file from FLAC format to ALAC.
-
-#### Dependencies:
-Install the following packages: `ffmpeg flac`
-
-#### Usage
-
-`flac2alac <flacfile>`
+	mkalac  <cuefile>                     # with auto encoding
+	mkalac  <cuefile> <-e> <encoding>     # with encoding in the option -e, use 'iconv -l' to view the supported encoding
+	mkalac  <flacfile>
+	mkalac  <directory>                   # with auto encoding for cue files
+	mkalac  <directory> <-e> <encoding>   # with encoding in the option -e, use 'iconv -l' to view the supported encoding
