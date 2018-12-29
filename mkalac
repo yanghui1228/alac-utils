@@ -10,7 +10,12 @@ ENCA_LANGUAGE='zh'
 
 usage()
 {
-	echo "usage: cue2alac <cuefile> <-e> <encoding>"
+	echo "Usage:"
+	echo "mkalac  <cuefile>  # with auto encoding"
+	echo "mkalac  <cuefile> <-e> <encoding> # with encoding in the option -e, use 'iconv -l' to view the supported encoding"
+	echo "mkalac  <flacfile>"
+	echo "mkalac  <directory>  # with auto encoding"
+	echo "mkalac  <directory> <-e> <encoding> # with encoding in the option -e, use 'iconv -l' to view the supported encoding"
 }
 
 program_exists ()
