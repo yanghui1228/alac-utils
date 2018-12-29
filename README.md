@@ -3,6 +3,7 @@
 ## mkalac
 
 Converts ape+cue, wv+cue, flac+cue, flac to ALAC (.m4a) files.
+This utility is only tested on MacOS Mojave so be careful when running in the other platform
 
 #### Dependencies:
 Install the following packages: `ffmpeg flac shntool cuetools`
