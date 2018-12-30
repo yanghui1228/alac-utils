@@ -170,6 +170,13 @@ convertcue()
 		ffmpeg -v warning -i "$music_file" "tmp/$music_file_tmp"
 		music_file="tmp/$music_file_tmp"
 	fi
+	if [ "$ext" == ".wav" ]; then
+		local music_file_tmp="${music_file/%wav/flac}"
+		echo "Converting $music_file to $music_file_tmp ..."
+		ffmpeg -v warning -i "$music_file" "tmp/$music_file_tmp"
+		music_file="tmp/$music_file_tmp"
+	fi
+
 
 	#
 	# Perform splitting to separate FLAC files
