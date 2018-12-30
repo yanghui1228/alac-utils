@@ -26,3 +26,8 @@
 	mkalac  <flacfile>
 	mkalac  <directory>                   # with auto encoding for cue files
 	mkalac  <directory> <-e> <encoding>   # with encoding in the option -e, use 'iconv -l' to view the supported encoding
+	
+	For Chinese users, please try encoding GB18030 or BIG5
+	example:
+	mkalac <Yourpath>/YourFileName.cue -e GB18030
+	mkalac <YourPath>/YourFileName.wav -e BIG5
