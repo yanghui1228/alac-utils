@@ -85,12 +85,6 @@ convertwav()
 	local parameter="$2"
 	local encoding="$3"
 	local outfile="${infile/%wav/m4a}"
-	#local album_artist=$(metaflac --show-tag='ALBUM ARTIST' "$infile" | sed 's/ALBUM ARTIST=//g')
-	#local title="$(metadata "$infile" "%t")"
-	#local album_artist="$(metadata "$infile" "%P")"
-	#local artist="$(metadata "$infile" "%p")"
-	#local album="$(metadata "$infile" "%T")"
-	#local composer="$(metadata "$infile" "%c")"
 	mkdir -p tmp
 
 	#
@@ -111,7 +105,6 @@ convertwav()
 		iconv -f "$encoding" -t UTF-8 "$meta_file_temp" > "$meta_file"
 	fi
 	echo "Converting $infile to $outfile ..."
-	#ffmpeg -i "$infile" -acodec alac -metadata album_artist="$album_artist" "$outfile"
 	ffmpeg -i "$infile" -i "$meta_file" -map_metadata 1 -acodec alac "$outfile"
 	#
 	# Delete temp stuff
@@ -184,9 +177,9 @@ convertcue()
 
 	shnsplit -d tmp -f "$cue_file" -o flac -t '%n' "$music_file"
 
-	if [ -n "$music_file_tmp" ]; then
+	if [ -n "tmp/$music_file_tmp" ]; then
 		echo "Removing temporary file $music_file_tmp ..."
-		rm -rf "$music_file_tmp"
+		rm -rf "tmp/$music_file_tmp"
 	fi
 
 	rm -f tmp/00.flac
@@ -249,7 +242,6 @@ main()
 		exit
 	fi
 
-	#local cue_file="$1"
 	VAR="$1"
 	echo "Working Directory: ${DIR}"
 	if [ -f "$1" ]; then
@@ -260,8 +252,8 @@ main()
 	fi
 
 	# check input parameter if the file name is passed or it's only the directory
-	# the Priority is to convert the .cue files first. The other files will be skipped if .cue file existing.
-	# If no .cue files found, all the other types of files will be converted.
+	# the Priority is to convert the .cue sheet first. The other files will be skipped if .cue sheet existing.
+	# If no .cue sheet found, all the other types of files will be converted.
 	# file -> check file extension and convert.
 	# directory -> convert all the cue and flac files under the directory
 	cd "$DIR"
@@ -281,6 +273,7 @@ main()
 		if [ "$ext" == ".flac" ]; then
 			convertflac "$file_name"
 		fi
+
 	else
 		echo "Converting all the files under the directory"
 		for file in *.cue; do
