@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 # Cuesheet encoding auto-fix settings.
 #
@@ -12,9 +13,12 @@ usage()
 	echo "Usage:"
 	echo "mkalac  <cuefile>  # with auto encoding"
 	echo "mkalac  <cuefile> <-e> <encoding> # with encoding in the option -e, use 'iconv -l' to view the supported encoding"
+	echo "mkalac  <wavfile>  # with auto encoding"
+	echo "mkalac  <wavfile> <-e> <encoding> # with encoding in the option -e, use 'iconv -l' to view the supported encoding"
 	echo "mkalac  <flacfile>"
 	echo "mkalac  <directory>  # with auto encoding"
 	echo "mkalac  <directory> <-e> <encoding> # with encoding in the option -e, use 'iconv -l' to view the supported encoding"
+
 }
 
 program_exists ()
@@ -71,7 +75,51 @@ convertflac()
 	local outfile="${infile/%flac/m4a}"
 	local album_artist=$(metaflac --show-tag='ALBUM ARTIST' "$infile" | sed 's/ALBUM ARTIST=//g')
 	echo "Converting $infile to $outfile ..."
-	ffmpeg -i "$infile" -acodec alac -metadata album_artist="$album_artist" "$outfile"
+	ffmpeg -i "$infile" -map 0:0 -acodec alac -metadata album_artist="$album_artist" "$outfile"
+	echo "Done!"
+}
+
+convertwav()
+{
+	local infile="$1"
+	local parameter="$2"
+	local encoding="$3"
+	local outfile="${infile/%wav/m4a}"
+	#local album_artist=$(metaflac --show-tag='ALBUM ARTIST' "$infile" | sed 's/ALBUM ARTIST=//g')
+	#local title="$(metadata "$infile" "%t")"
+	#local album_artist="$(metadata "$infile" "%P")"
+	#local artist="$(metadata "$infile" "%p")"
+	#local album="$(metadata "$infile" "%T")"
+	#local composer="$(metadata "$infile" "%c")"
+	mkdir -p tmp
+
+	#
+	# Try to automatically fix possible non-UTF-8 encoding in cuefile
+	#
+	local meta_file_temp="tmp/$infile"
+	meta_file_temp="${meta_file_temp/%wav/txt}"
+	ffmpeg -i "$infile"  -f ffmetadata "$meta_file_temp"
+
+	if program_exists iconv; then
+		if [ -z "$3" ]; then
+			echo "Trying to auto-convert $meta_file to UTF-8 ..."
+			encoding=`file --mime "$meta_file_temp" | sed 's/^[^:]*: .*set=\(.*\)/\1/'`
+		else
+			echo "Trying to convert $meta_file_temp from $encoding to UTF-8 ..."
+		fi
+		local meta_file="${meta_file_temp/%txt/utf8.txt}"
+		iconv -f "$encoding" -t UTF-8 "$meta_file_temp" > "$meta_file"
+	fi
+	echo "Converting $infile to $outfile ..."
+	#ffmpeg -i "$infile" -acodec alac -metadata album_artist="$album_artist" "$outfile"
+	ffmpeg -i "$infile" -i "$meta_file" -map_metadata 1 -acodec alac "$outfile"
+	#
+	# Delete temp stuff
+	#
+
+	echo "Removing temporary files ..."
+	rm -rf tmp
+
 	echo "Done!"
 }
 
@@ -95,8 +143,9 @@ convertcue()
 		if [ -z "$3" ]; then
 			echo "Trying to auto-convert $cue_file to UTF-8 ..."
 			encoding=`file --mime "$cue_file" | sed 's/^[^:]*: .*set=\(.*\)/\1/'`
-		fi	
-		echo "Trying to convert $cue_file from $encoding to UTF-8 ..."
+		else
+			echo "Trying to convert $cue_file from $encoding to UTF-8 ..."
+		fi
 		iconv -f "$encoding" -t UTF-8 "$cue_file" > "tmp/$cue_file"
 	else
 		cp -f "$cue_file" "tmp/$cue_file"
@@ -211,14 +260,21 @@ main()
 	fi
 
 	# check input parameter if the file name is passed or it's only the directory
+	# the Priority is to convert the .cue files first. The other files will be skipped if .cue file existing.
+	# If no .cue files found, all the other types of files will be converted.
 	# file -> check file extension and convert.
 	# directory -> convert all the cue and flac files under the directory
 	cd "$DIR"
 	if [ -f "$1" ]; then
+		# The procedure to conver the files
 		echo "File_Name        : $file_name"
 		ext=`echo "${file_name: -4}" | tr "[:upper:]" "[:lower:]"`
 		if [ "$ext" == ".cue" ]; then
 			convertcue "$file_name" "$2" "$3"
+		fi
+
+		if [ "$ext" == ".wav" ]; then
+			convertwav "$file_name" "$2" "$3"
 		fi
 
 		ext=`echo "${file_name: -5}" | tr "[:upper:]" "[:lower:]"`
@@ -227,20 +283,23 @@ main()
 		fi
 	else
 		echo "Converting all the files under the directory"
-		
-		for file in *.flac; do
-			if [ "$file" == "*.flac" ]; then
-				echo 'No .flac file found'
-			else
-				convertflac "$file"
-			fi
-
-		done
 		for file in *.cue; do
 			if [ "$file" == "*.cue" ]; then
-				echo 'No .cue file found!'
+				for file in *.flac; do
+					if [ "$file" != "*.flac" ]; then
+						convertflac "$file"
+					fi
+				done
+				for file in *.wav; do
+					if [ "$file" != "*.wav" ]; then
+						convertwav "$file" "$2" "$3"
+					fi
+				done
 			else
 				convertcue "$file" "$2" "$3"
+				echo "Other files will be skipped because the cue file existing!"
+				echo "Please delete the cue file if you want to convert the other files, "
+				echo "or use mkalac to convert the other files seperately!"
 			fi
 		done
 	fi
