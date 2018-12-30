@@ -10,6 +10,8 @@
 	Install the following packages: `ffmpeg flac shntool cuetools`
 
 #### Usage:
+copy 'mkalac' to your Mac's /usr/local⁩/⁨bin/ folder⁩
+Then below should work - 
 	mkalac  <cuefile>                     # with auto encoding
 	mkalac  <cuefile> <-e> <encoding>     # with encoding in the option -e, use 'iconv -l' to view the supported encoding
 	mkalac  <wavfile>                     # with auto encoding
